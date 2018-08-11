@@ -98,6 +98,7 @@ This project would not have been possible without the exceptional work of many o
 
 * Jupyter and Python community 
 * Tensorflow and Keras community
+* PurpleBooth for her [README.md template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
 
 If you feel, your part is not listed here, drop me a mail.
 
