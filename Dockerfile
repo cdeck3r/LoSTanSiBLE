@@ -119,5 +119,11 @@ RUN pip3 install http://download.pytorch.org/whl/cpu/torch-0.3.1-cp35-cp35m-linu
 # but it doesn't seem to be active anymore.
 RUN pip3 install --no-cache-dir git+https://github.com/waleedka/coco.git#subdirectory=PythonAPI
 
+#
+# Supplemental tools (cdeck3r)
+#
+COPY install_supplementals.sh /tmp
+RUN /tmp/install_supplementals.sh
+
 WORKDIR "/root"
 CMD ["/bin/bash"]
