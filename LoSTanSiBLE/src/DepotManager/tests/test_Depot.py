@@ -136,3 +136,134 @@ def test_sell_order(depot):
     # assert total_shares
     total_shares = depot.totalStockinDepot()
     assert total_shares == 0
+
+def test_tax(depot):
+    depot.broker.balance = 1000
+    # buy 10; price 10; volume 100
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # assert one transaction more than initial
+    transactions = depot.orderbook.totalTransactions()
+    assert transactions == 2
+    # assert balance
+    balance = depot.broker.balance
+    assert balance < 1000-100
+    # assert total_shares
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 10
+    # test TAX; first buy -> no tax
+    assert depot.TAX == 0
+
+    # sell all: sell 10; price 10.5; volume 105 (5% gross_profit)
+    depot.sell(dt.datetime.now().date(), 10, 10.5)
+    transactions = depot.orderbook.totalTransactions()
+    assert transactions == 3
+    # assert balance
+    balance = depot.broker.balance
+    assert balance > 1000-100
+    assert balance < 1000
+    # assert total_shares
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 0
+    # assert TAX > 0
+    depot.TAX == 1.25
+
+    depot.broker.balance = 1000
+    # buy 10; price 10; volume 100
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # sell all: sell 10; price 9.5; volume 95 (5% loss)
+    depot.sell(dt.datetime.now().date(), 10, 9.5)
+    # assert total_shares
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 0
+    # assert TAX == 0, because we had the same win and loss
+    assert depot.TAX == 0
+
+def test_multiorder_tax_loss_and_profits(depot):
+    # initialize balance
+    depot.broker.balance = 1000
+
+    # buy 10; price 10; volume 100
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # buy 10; price 10; volume 100
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # sell 10; price 10; volume 100
+    depot.sell(dt.datetime.now().date(), 10, 10)
+    # assert total_shares; we have stocks in the depot
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 10
+    # we expect not to pay tax
+    assert depot.TAX == 0
+
+    # buy again 10; price 10; volume 100
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # sell 10; price 9.5; volume 95 (5% loss)
+    depot.sell(dt.datetime.now().date(), 10, 9.5)
+    # assert total_shares; we have stocks in the depot
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 10
+    # we expect not to pay tax, because we made an overall loss
+    assert depot.TAX == 0
+
+    # buy again 10; price 10; volume 100
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # sell 10; price 10.5; volume 105 (5% profit)
+    depot.sell(dt.datetime.now().date(), 10, 10.5)
+    # assert total_shares; we have stocks in the depot
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 10
+    # we do not expect pay tax; we made overall a 5% loss and 5% win
+    assert depot.TAX == 0
+
+def test_multiorder_tax_profits(depot):
+    # initialize balance
+    depot.broker.balance = 1000
+
+    # buy 10; price 10; volume 100
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # buy 10; price 10; volume 100
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # sell 10; price 10; volume 100
+    depot.sell(dt.datetime.now().date(), 10, 10.5)
+    # assert total_shares; we have stocks in the depot
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 10
+    # pay tax on 5% profit
+    assert depot.TAX == 1.25
+
+    depot.buy(dt.datetime.now().date(), 10, 10 )
+    # sell 10; price 10; volume 100
+    depot.sell(dt.datetime.now().date(), 10, 10.5)
+    # assert total_shares; we have stocks in the depot
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 10
+    # pay tax on another 5% profit
+    assert depot.TAX == 2.5 # overall tax paid
+
+def test_multiorder_tax_neutral(depot):
+    # we test the tax calc when buying and selling
+    # different shares and prices
+
+    # initialize balance
+    depot.broker.balance = 1000
+
+    # buy 30; price 10; volume 300
+    depot.buy(dt.datetime.now().date(), 50, 10 )
+    # assert balance
+    assert depot.broker.balance < 1000-500
+    # sell 10; price 9.5; volume 95
+    depot.sell(dt.datetime.now().date(), 10, 9.5)
+    # assert balance
+    assert depot.broker.balance < 1000-500+95
+    # sell 10; price 9.5; volume 95
+    depot.sell(dt.datetime.now().date(), 10, 9.5)
+    # assert balance
+    assert depot.broker.balance < 1000-500+95+95
+    # buy 10; price 11; volume 110
+    depot.buy(dt.datetime.now().date(), 10, 11)
+    # assert balance
+    assert depot.broker.balance < 1000-500+95+95-110
+    # assert total_shares; we have stocks in the depot
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 40
+    # pay tax on another 5% profit
+    assert depot.TAX == 0 # overall tax paid

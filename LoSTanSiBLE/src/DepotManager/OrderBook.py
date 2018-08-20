@@ -42,5 +42,7 @@ class OrderBook:
 
     def getLastTransaction(self):
         lastIndex = self.totalTransactions()-1
-        pd.df = self.transactions.iloc[[lastIndex]]
-        return pd.df.reindex([lastIndex])
+        df = self.transactions.iloc[[lastIndex]]
+        df.index = [lastIndex]
+        return df
+        

@@ -1,9 +1,6 @@
 
 #-*- coding: utf-8 -*-
 
-# for reading transactions
-import pandas as pd
-
 class Depot:
     """Depot handles all buying and selling of stocks."""
     def __init__(self, stock, broker = None, orderbook = None):
@@ -38,7 +35,7 @@ class Depot:
 
     @TAX.setter
     def TAX(self, TAX):
-        self.__TAX = max(TAX, 0)
+        self.__TAX = max(TAX,0)
 
 
     def totalStockinDepot(self):
@@ -51,7 +48,7 @@ class Depot:
     def buy(self, date, shares, price):
         """
         Steps to buy stocks
-        1. Calculate fee; tax is zero
+        1. Calculate fee
         2. Calculate order volume
         3. Check if sufficient balance available
         3a. insufficient balance: zero transaction
@@ -60,7 +57,6 @@ class Depot:
         """
         # step 1
         fee = self.broker.calcFee(shares, price)
-        tax = 0
         # step 2
         order_volume = shares * price
         # step 3
@@ -97,5 +93,17 @@ class Depot:
         self.orderbook.addTransaction(date, 'sell', self.__stock, shares, price, fee)
         # step 5
         self.broker.balance += (order_volume - fee)
+
         # step 6
-        #self.broker.calcTax(self.orderbook)
+        tax = self.broker.calcTax(self.orderbook, self.stock)
+
+        if tax > 0 :
+            delta_tax = tax - self.TAX
+            self.TAX = tax # overall tax
+            self.broker.balance -= delta_tax
+        else :
+            loss_tax = tax
+            if tax == 0:
+                loss_tax = 0-self.TAX
+            self.broker.balance -= max(loss_tax, 0-self.TAX)
+            self.TAX += loss_tax
