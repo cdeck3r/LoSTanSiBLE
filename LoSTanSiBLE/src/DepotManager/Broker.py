@@ -11,6 +11,11 @@ class Broker:
 
     __TAX_rate = 0.25
 
+    @classmethod
+    def setTAXRate(self, tax_rate):
+        """ Sets the class variable for tax calculation. """
+        Broker.__TAX_rate = tax_rate
+
     def __init__(self, balance = 0):
         self.balance = balance
 
@@ -42,7 +47,7 @@ class Broker:
 
         gross_profit = tot_sell - (tot_buy - tot_depot)
 
-        return self.__TAX_rate * gross_profit
+        return Broker.__TAX_rate * gross_profit
 
 
     @abc.abstractmethod

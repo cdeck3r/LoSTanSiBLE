@@ -9,10 +9,13 @@ sys.path.insert(0, myPath + '/../')
 
 import pytest
 
-from DepotBuilder import DepotBuilder
+# required classes
+from Broker import Broker
+from comdirect import comdirect
+from Depot import Depot
+from OrderBook import OrderBook
 
 import pandas as pd
-
 import datetime as dt
 
 
@@ -24,7 +27,13 @@ def depot():
     """
     # import requests
     # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
-    return DepotBuilder('APPL').getDepot()
+    """ First of all, it builds the Depot """
+    Broker.setTAXRate(0.25)
+    broker = comdirect()
+    orderbook = OrderBook()
+    depot = Depot(stock='APPL', broker=broker, orderbook=orderbook)
+
+    return depot
 
 def test_balance(depot):
     """Sample pytest test function with the pytest fixture as an argument."""
