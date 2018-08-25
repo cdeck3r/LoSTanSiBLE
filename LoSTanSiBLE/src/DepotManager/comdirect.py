@@ -22,10 +22,15 @@ class comdirect(Broker):
         zusätzlich fremde Kosten (wie z. B. Maklercourtage) in der
         Wertpapierabrechnung aus.
         """
-        self.order_volume = shares * price
-        if self.order_volume <= 2000 :
-            self.fee = 9.9
-        else:
-            self.fee = 4.9 + ( 0.25/100 * self.order_volume )
+        order_volume = shares * price
 
-        return min(self.fee, 59.90)
+        # special case: no fees, if there is no volume
+        if order_volume == 0:
+            return 0
+
+        if order_volume <= 2000 :
+            fee = 9.9
+        else:
+            fee = 4.9 + ( 0.25/100 * order_volume )
+
+        return min(fee, 59.90)

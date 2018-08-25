@@ -84,11 +84,14 @@ test_environment:
 
 ## freeze current python environment
 freeze:
-	source ${PROJECT_ENV}/bin/activate && ${PROJECT_ENV}/bin/pip freeze > requirements.txt
+	. ${PROJECT_ENV}/bin/activate && ${PROJECT_ENV}/bin/pip freeze > requirements.txt
 
 ## remove the current python environment
 clean_environment:
 	rm -rf ${PROJECT_ENV}
+
+## setup a completely new virtualenv venv, deletes an old one
+setup_venv: clean_environment create_environment
 
 #################################################################################
 # PROJECT RULES                                                                 #

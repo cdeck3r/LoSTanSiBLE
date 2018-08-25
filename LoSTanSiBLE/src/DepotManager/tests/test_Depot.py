@@ -99,6 +99,73 @@ def test_buy_order(depot):
     buy_transactions = df.shape[0]
     assert buy_transactions == 1
 
+def test_zero_sell_order(depot):
+    # in a zero cell order, shares are sold although
+    # no shares are available
+    depot.broker.balance = 1000
+    # assert balance
+    assert depot.broker.balance == 1000
+    # assert total_shares
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 0
+
+    # sell 0, price 10
+    depot.sell(dt.datetime.now().date(), 0, 10)
+    transactions = depot.orderbook.totalTransactions()
+    assert transactions == 2
+
+    # assert balance
+    #balance = depot.broker.balance
+    assert depot.broker.balance == 1000
+    # assert total_shares
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 0
+    # no tax
+    assert depot.TAX == 0 # overall tax paid
+
+    # sell 0, price 0
+    depot.sell(dt.datetime.now().date(), 0, 0)
+    transactions = depot.orderbook.totalTransactions()
+    assert transactions == 3
+
+    # assert balance
+    #balance = depot.broker.balance
+    assert depot.broker.balance == 1000
+    # assert total_shares
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 0
+    # no tax
+    assert depot.TAX == 0 # overall tax paid
+
+    # sell 10, price 10
+    depot.sell(dt.datetime.now().date(), 10, 10)
+    transactions = depot.orderbook.totalTransactions()
+    assert transactions == 4
+
+    # assert balance
+    #balance = depot.broker.balance
+    assert depot.broker.balance == 1000
+    # assert total_shares
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 0
+    # no tax
+    assert depot.TAX == 0 # overall tax paid
+
+    # sell 10, price 0
+    depot.sell(dt.datetime.now().date(), 10, 0)
+    transactions = depot.orderbook.totalTransactions()
+    assert transactions == 5
+
+    # assert balance
+    #balance = depot.broker.balance
+    assert depot.broker.balance == 1000
+    # assert total_shares
+    total_shares = depot.totalStockinDepot()
+    assert total_shares == 0
+    # no tax
+    assert depot.TAX == 0 # overall tax paid
+
+
 def test_sell_order(depot):
     depot.broker.balance = 1000
     # buy 10; volume 100

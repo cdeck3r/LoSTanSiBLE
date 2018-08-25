@@ -23,7 +23,7 @@ class DepotManager:
         self.__broker = broker
         self.__orderbook = orderbook
 
-    def builtDepot(self, stock):
+    def buildDepot(self, stock):
         """ Builds the Depot. """
         depot = Depot(stock=stock, broker=self.__broker, orderbook=self.__orderbook)
         return depot

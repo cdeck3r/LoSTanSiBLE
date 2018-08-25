@@ -18,7 +18,7 @@ import datetime as dt
 def test_DepotManager():
     dpMng = DepotManager()
     # Create an APPL depot
-    depotAPPL = dpMng.builtDepot('APPL')
+    depotAPPL = dpMng.buildDepot('APPL')
     # charge the broker's balanace
     depotAPPL.broker.balance = 1000
     assert depotAPPL.broker.balance == 1000

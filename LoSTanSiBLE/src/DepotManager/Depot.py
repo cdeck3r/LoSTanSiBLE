@@ -37,6 +37,13 @@ class Depot:
     def TAX(self, TAX):
         self.__TAX = max(TAX,0)
 
+    def __isNaN(self, num):
+        """ Simple test for nan.
+
+            Does not require import math statement.
+            see: https://stackoverflow.com/a/944712
+        """
+        return num != num
 
     def totalStockinDepot(self):
         #buy_df = pd.DataFrame()
@@ -96,6 +103,8 @@ class Depot:
 
         # step 6
         tax = self.broker.calcTax(self.orderbook, self.stock)
+        if self.__isNaN(tax) :
+            tax = 0
 
         if tax > 0 :
             delta_tax = tax - self.TAX
