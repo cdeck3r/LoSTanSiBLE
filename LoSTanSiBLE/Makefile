@@ -91,7 +91,7 @@ clean_environment:
 	rm -rf ${PROJECT_ENV}
 
 ## setup a completely new virtualenv venv, deletes an old one
-setup_venv: clean_environment create_environment
+venv: clean_environment create_environment
 
 #################################################################################
 # PROJECT RULES                                                                 #
